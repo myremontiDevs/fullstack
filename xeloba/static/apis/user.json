@@ -1,0 +1,31 @@
+[
+    {
+      "userID": "001",
+      "fullname": "John Doe",
+      "phone": "123-456-7890",
+      "date": "04/05/2024",
+      "email": "john.doe@example.com"
+    },
+    {
+      "userID": "002",
+      "fullname": "Jane Smith",
+      "phone": "987-654-3210",
+      "date": "04/08/2024",
+      "email": "jane.smith@example.com"
+    },
+    {
+      "userID": "003",
+      "fullname": "Alice Johnson",
+      "phone": "555-555-5555",
+      "date": "04/08/2024",
+      "email": "alice.johnson@example.com"
+    },
+    {
+        "userID": "004",
+        "fullname": "შოთა რუსთაველი",
+        "phone": "585-555-5555",
+        "date": "04/01/2024",
+        "email": "shota.johnson@example.com"
+    }
+]
+  

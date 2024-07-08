@@ -1,0 +1,154 @@
+@font-face {
+    font-family: 'ninobold';
+    src: url("./fonts/bpg-nino-mkhedruli-bold-webfont.ttf");
+}
+@font-face {
+    font-family: 'ninomedium';
+    src: url("./fonts/bpg-nino-medium-condenced-webfont.ttf");
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f8f9fa;
+}
+.auth {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'ninobold';
+}
+.logo {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 25px;
+}
+.logo img {
+    width: 100%;
+    height: 100%;
+}
+.auth h3 {
+    color:#2c2b29;
+    letter-spacing: .5px;
+    padding:10px 0 ;
+
+}
+.auth form {
+    display: flex;
+    flex-direction: column;
+    color: #2c2b29;
+    width: 250px;
+}
+.auth form input {
+    padding: 15px 5px;
+    background: none;
+    border-radius: 5px;
+    border: 1px solid #2c2b29;
+    text-align: center;
+    margin: 0 0 14px 0;
+    font-family: 'ninobold';
+    color: #2c2b29;
+
+
+}
+.auth form input::placeholder {
+    color: #fff;
+    font-family: 'ninobold';
+    font-size: 12px;
+
+}
+.auth form label {
+    font-size: 13px;
+    text-align: center;
+    padding: 23px 0 11px 0;
+}
+
+/* admin panel style */
+/* 
+.navpanel {
+    width: 15%;
+    height: 100vh;
+    background: burlywood;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+}
+    
+
+.navpanel  .logo {
+    width: 100px;
+    height: 100px;
+    margin: 15px auto;
+}
+
+.navpanel ul li {
+    list-style: none;
+    text-align: center;
+    background:rgba(17, 24, 39, 0.50);
+    margin: 10px 0;
+}
+.navpanel li a {
+    width: 100%;
+    text-decoration: none;
+    color: #fff;
+    font-family: 'ninobold';
+    padding: 15px;
+    display: block;
+
+
+}
+.navpanel ul li a:active, a:hover {
+    background:rgba(17, 24, 39, 1);
+
+} */
+/* .users {
+    width: 100%;
+    height: 100%;
+}
+section {
+    width: 85%;
+    height: 100vh;
+    position: absolute;
+    right:0;
+}
+
+.list {
+    width: 31%;
+    height: 300px;
+    background: cadetblue;
+    margin: 15px 0;
+}
+.list a {
+    text-decoration: none;
+    color: #fff;
+} */
+
+.table {
+    margin-top: 33px;
+    font-family: 'ninomedium';
+
+
+}
+.nav-link {
+    font-family: 'ninobold';
+
+}
+.addusers {
+    margin: 33px 0;
+    position: fixed;
+    right: 1%;
+    bottom: 0;
+    font-family: 'ninobold';
+
+}
+.navbar-brand img {
+    border-radius: 50%;
+}
