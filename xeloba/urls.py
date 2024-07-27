@@ -16,6 +16,8 @@ urlpatterns = [
     path('edit', views.edit_user, name='edit_user'),
     path('verifyuser', views.verify_user, name='edit_user'),
     path('myPage', views.index, name='space'),
+    path('statistics', views.statistics, name='statistics'),
+    path('onOff', views.onOffst, name='on_off')
 
 
 

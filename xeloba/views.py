@@ -31,6 +31,10 @@ print(formatted_datetime)
 api_url = 'http://127.0.0.1:5500/data.json'
 response = requests.get(api_url)
 
+status_url = 'http://127.0.0.1:5500/onOff.json'
+status_res = requests.get(status_url)
+
+
 if response.status_code == 200:
     data = response.json()
 else:
@@ -106,15 +110,13 @@ def login(request):
     else:
         return HttpResponse("Method not allowed", status=405)
 
-def statistics():
+
+def statistics(request):
     api_url = 'http://127.0.0.1:5500/data.json'
     response = requests.get(api_url)
 
     if response.status_code == 200:
         data = response.json()
-
-        # Print the fetched data for debugging
-        print("Fetched data:", data)
 
         # Create a new Excel workbook
         workbook = openpyxl.Workbook()
@@ -155,21 +157,26 @@ def statistics():
             sheet2.cell(row=1, column=col_num, value=header)
 
         # Populate data from the API response into the second sheet
+        formatted_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         sheet2['A2'] = formatted_datetime
-        sheet2['B2'] = bl
-    
+        sheet2['B2'] = 'Some SMS data'  # Replace with actual data
 
-        # Save the workbook
-        workbook.save(f'reports/userReport-{dateshorts}.xlsx')
+        # Save the workbook to a BytesIO object
+        from io import BytesIO
+        output = BytesIO()
+        workbook.save(output)
+        output.seek(0)
 
-        # Print a message indicating successful saving
-        return "Excel file created successfully"
+        # Create the HTTP response for file download
+        response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+       
+        filename = f"report-{dateshorts}.xlsx"
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+
+        return response
 
     else:
-        # Print an error message if failed to fetch data from API
-        return "Failed to fetch data from API"
-
-statistics()
+        return HttpResponse("Failed to fetch data from API", status=500)
 
 
 def newUserNotify():
@@ -253,7 +260,7 @@ def reg(request):
         }
 
         # Read existing data from the JSON file or initialize an empty list
-        json_file_path = './data.json'
+        json_file_path = 'http://127.0.0.1:5500/data.json'
         if os.path.exists(json_file_path) and os.path.getsize(json_file_path) > 0:
             with open(json_file_path, 'r', encoding='utf-8') as json_file:
                 data = json.load(json_file)
@@ -296,7 +303,7 @@ def edit_user(request):
         }
 
         # Read existing data from the JSON file or initialize an empty list
-        json_file_path = './data.json'
+        json_file_path = 'http://127.0.0.1:5500/data.json'
         if os.path.exists(json_file_path) and os.path.getsize(json_file_path) > 0:
             with open(json_file_path, 'r', encoding='utf-8') as json_file:
                 data = json.load(json_file)
@@ -347,7 +354,7 @@ def delete_user(request):
             delid = int(delid)
 
             # Read existing data from the JSON file
-            json_file_path = './data.json'  # Ensure this path is correct relative to your project
+            json_file_path = 'http://127.0.0.1:5500/data.json'  # Ensure this path is correct relative to your project
             if os.path.exists(json_file_path) and os.path.getsize(json_file_path) > 0:
                 with open(json_file_path, 'r', encoding='utf-8') as json_file:
                     data = json.load(json_file)
@@ -430,34 +437,38 @@ def add_user(request):
     else:
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
+
 def verify_user(request):
     if request.method == "POST":
         mob = request.POST.get('phoneNumber')
         name = request.POST.get('name')
         user_id = request.POST.get('userid')
 
-        # Simulate response with status '1' for the purpose of this example
-        response = {'status': '1'}  # Replace with actual logic to get the response status
+        response = {'status': 'false'}
 
-        if response['status'] == '1':
-            # Read existing data from the JSON file
-            json_file_path = './data.json'
-            with open(json_file_path, 'r', encoding='utf-8') as json_file:
-                data = json.load(json_file)
+        if response['status'] == 'false':
+            # Fetch existing data from the JSON file URL
+            json_file_url = 'http://127.0.0.1:5500/data.json'
+            json_response = requests.get(json_file_url)
+            if json_response.status_code == 200:
+                data = json_response.json()
+            else:
+                print('Failed to fetch data from URL')
+                return render(request, 'adminpanel.html', {
+                    'users': user, 
+                    'categories': categories,
+                    'smsbalance': bl
+                })
 
             # Find the user with the matching user_id and update their status
             user_found = False
             for user in data:
                 if user['userID'] == user_id:
-                    user['status'] = "1"
+                    user['status'] = "true"
                     user_found = True
                     break
 
             if user_found:
-                # Write the updated data back to the JSON file
-                with open(json_file_path, 'w', encoding='utf-8') as json_file:
-                    json.dump(data, json_file, indent=4, ensure_ascii=False)
-
                 # Send the SMS notification
                 api_url = 'https://smsoffice.ge/api/v2/send/'
                 params = {
@@ -472,33 +483,37 @@ def verify_user(request):
 
                 if sms_response.status_code == 200:
                     print('SMS sent successfully')
-                    s = sms_response.json()
-                    
+
                     user_data = {
-                        "userID": user_id [
-                            'smsDelivery': True,
-                        ],
-                    
+                        "userID": user_id,
+                        'smsDelivery': True,
                     }
 
-                    # Read existing data from the JSON file or initialize an empty list
-                    json_file_path = './smsfullreport.json'
-                    if os.path.exists(json_file_path) and os.path.getsize(json_file_path) > 0:
-                        with open(json_file_path, 'r', encoding='utf-8') as json_file:
-                            data = json.load(json_file)
-                    else:
-                        data = []
+                    # Update the user data in the main data list
+                    for user in data:
+                        if user['userID'] == user_id:
+                            user.update(user_data)
+                            break
 
-                    # Append new data to the existing data
-                    data.append(user_data)
-
-                    # Write the updated data back to the JSON file
-                    with open(json_file_path, 'w', encoding='utf-8') as json_file:
+                    # Write the updated data back to the JSON file on the local server
+                    local_json_file_path = 'http://127.0.0.1:5500/data.json'  # Ensure this path is correct
+                    with open(local_json_file_path, 'w', encoding='utf-8') as json_file:
                         json.dump(data, json_file, indent=4, ensure_ascii=False)
 
+                    # Read existing data from the local JSON file or initialize an empty list
+                    report_json_file_path = './smsfullreport.json'
+                    if os.path.exists(report_json_file_path) and os.path.getsize(report_json_file_path) > 0:
+                        with open(report_json_file_path, 'r', encoding='utf-8') as json_file:
+                            sms_data = json.load(json_file)
+                    else:
+                        sms_data = []
 
+                    # Append new data to the existing data
+                    sms_data.append(user_data)
 
-
+                    # Write the updated data back to the local JSON file
+                    with open(report_json_file_path, 'w', encoding='utf-8') as json_file:
+                        json.dump(sms_data, json_file, indent=4, ensure_ascii=False)
                 else:
                     print('Failed to send SMS')
                     print('Status Code:', sms_response.status_code)
@@ -508,12 +523,10 @@ def verify_user(request):
 
     # Render the admin panel with necessary context
     return render(request, 'adminpanel.html', {
-        'users': data, 
+        'users': user, 
         'categories': categories,
         'smsbalance': bl
     })
-
-
 # # sos sms 
 # if bl > 50:
 
@@ -535,3 +548,18 @@ def verify_user(request):
 #         print('Failed to send SMS')
 #         print('Status Code:', sms_response.status_code)
 #         print('Response:', sms_response.text)
+
+def onOffst(request):
+    if request.method == "POST":
+        status = request.POST.get('status')
+        onoff = {
+            "status": status
+        }
+
+        json_file_path = './onOff.json'
+
+        # Write the data to the file (overwrite if it exists)
+        with open(json_file_path, 'w', encoding='utf-8') as json_file:
+            json.dump([onoff], json_file, ensure_ascii=False, indent=4)
+
+        return render(request, 'adminpanel.html', {'users': data, 'categories': categories,'smsbalance': bl, "status": status_res} )
